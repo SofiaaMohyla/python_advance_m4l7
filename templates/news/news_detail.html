@@ -6,13 +6,50 @@
     <title>{{ news.title }}</title>
 </head>
 <body>
+{% load custom_filters %}
     <h1>{{ news.title }}</h1>
     <p>{{ news.published_at }}</p>
     <p>{{ news.content }}</p>
 
     <a href="{% url 'news_edit' news.pk %}">Edit</a>
     <a href="{% url 'news_delete' news.pk %}">Delete</a>
-
     <a href="{% url 'news_list' %}">Back to News List</a>
+
+    <hr>
+
+    <h2>Comments</h2>
+    {% if comments %}
+        {% for comment in comments %}
+            <div class="comment">
+                <p><strong>{{ comment.creator.username }}</strong>:</p>
+                <p>{{ comment.content }}</p>
+
+                {% if comment.media_file %}
+                    <div class="comment-media">
+                        {% if comment.media_file.url|endswith:".jpg" or comment.media_file.url|endswith:".png" or comment.media_file.url|endswith:".jpeg" %}
+                            <img src="{{ comment.media_file.url }}" alt="Зображення коментаря" style="max-width: 1000px;">
+                        {% elif comment.media_file.url|endswith:".mp4" %}
+                            <video width="320" height="240" controls>
+                                <source src="{{ comment.media_file.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        {% else %}
+                            <a href="{{ comment.media_file.url }}">Завантажити файл</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>No comments yet.</p>
+    {% endif %}
+
+    <h3>Leave a Comment</h3>
+    <form action="{% url 'add_comment' news.pk %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
 </body>
 </html>

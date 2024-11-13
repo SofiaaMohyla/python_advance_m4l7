@@ -18,3 +18,15 @@ class NewsFilterForm(forms.Form):
     ]
 
     status = forms.ChoiceField(choices=STATUS_CHOICES, required=False, label="Статус", widget=forms.Select(attrs={"class": "form-control"}))
+
+# forms.py
+from django import forms
+from .models import Comment
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content', 'media_file']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Add a comment...'}),
+        }
